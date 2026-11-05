@@ -18,9 +18,9 @@ const inter = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'OpenMAIC',
+  title: 'ThinkSphere',
   description:
-    'The open-source AI interactive classroom. Upload a PDF to instantly generate an immersive, multi-agent learning experience.',
+    'ThinkSphere creates a personal, interactive learning experience for every student.',
 };
 
 export default function RootLayout({
@@ -45,3 +45,4 @@ export default function RootLayout({
     </html>
   );
 }
+
