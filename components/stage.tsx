@@ -270,6 +270,13 @@ export function Stage({
     }
   }, [clearPresentationIdleTimer, isPresenting, isPresentationInteractionActive]);
 
+  useEffect(() => {
+    if (mode === 'playback') {
+      setChatAreaCollapsed(true);
+      setSidebarCollapsed(true);
+    }
+  }, [mode, setChatAreaCollapsed, setSidebarCollapsed]);
+
   const togglePresentation = useCallback(async () => {
     const stageElement = stageRef.current;
     if (!stageElement) return;
@@ -921,8 +928,8 @@ export function Stage({
 
   // Calculate scene viewer height (subtract Header's 80px height)
   const sceneViewerHeight = (() => {
-    const headerHeight = isPresenting ? 0 : 80; // Header h-20 = 80px
-    const roundtableHeight = mode === 'playback' && !isPresenting ? 192 : 0;
+    const headerHeight = mode === 'playback' || isPresenting ? 0 : 80; // Header h-20 = 80px
+    const roundtableHeight = 0;
     return `calc(100% - ${headerHeight + roundtableHeight}px)`;
   })();
 
@@ -930,22 +937,31 @@ export function Stage({
     <div
       ref={stageRef}
       className={cn(
-        'flex-1 flex overflow-hidden bg-gray-50 dark:bg-gray-900',
+        'flex-1 flex overflow-hidden',
+        mode === 'playback' ? 'bg-[#0b1229]' : 'bg-gray-50 dark:bg-gray-900',
         isPresenting && !controlsVisible && 'cursor-none',
       )}
     >
       {/* Scene Sidebar */}
-      <SceneSidebar
-        collapsed={sidebarCollapsed}
-        onCollapseChange={setSidebarCollapsed}
-        onSceneSelect={gatedSceneSwitch}
-        onRetryOutline={onRetryOutline}
-      />
+      {mode !== 'playback' && (
+        <SceneSidebar
+          collapsed={sidebarCollapsed}
+          onCollapseChange={setSidebarCollapsed}
+          onSceneSelect={gatedSceneSwitch}
+          onRetryOutline={onRetryOutline}
+        />
+      )}
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0 relative">
+        {mode === 'playback' && (
+          <div className="pointer-events-none absolute left-6 top-5 z-30 flex items-center gap-2 font-bold tracking-tight text-white">
+            <span aria-hidden="true" className="relative inline-flex size-6 rounded-full border-[3px] border-violet-400 rotate-[-28deg] after:absolute after:inset-x-[-5px] after:top-[8px] after:h-1 after:rounded-full after:bg-cyan-300" />
+            <span>ThinkSphere</span>
+          </div>
+        )}
         {/* Header */}
-        {!isPresenting && <Header currentSceneTitle={currentScene?.title || ''} />}
+        {!isPresenting && mode !== 'playback' && <Header currentSceneTitle={currentScene?.title || ''} />}
 
         {/* Canvas Area */}
         <div
@@ -1126,6 +1142,7 @@ export function Stage({
               onNextSlide={handleNextScene}
               onWhiteboardClose={handleWhiteboardToggle}
               isPresenting={isPresenting}
+              compactPlayback={mode === 'playback'}
               controlsVisible={controlsVisible}
               onTogglePresentation={togglePresentation}
               onPresentationInteractionChange={setIsPresentationInteractionActive}
@@ -1238,3 +1255,4 @@ export function Stage({
     </div>
   );
 }
+
