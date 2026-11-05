@@ -91,6 +91,7 @@ interface RoundtableProps {
   /** Ref to the fullscreen container — passed to ProactiveCard so its portal
    *  renders inside the top-layer during presentation mode. */
   readonly fullscreenContainerRef?: React.RefObject<HTMLDivElement | null>;
+  readonly compactPlayback?: boolean;
 }
 
 const VOICE_WAVE_BARS = [
@@ -174,6 +175,7 @@ export function Roundtable({
   onTogglePresentation,
   onPresentationInteractionChange,
   fullscreenContainerRef,
+  compactPlayback = false,
 }: RoundtableProps) {
   const { t } = useI18n();
   const ttsMuted = useSettingsStore((s) => s.ttsMuted);
@@ -606,13 +608,8 @@ export function Roundtable({
     onPlayPause,
   ]);
   const showPresentationDock =
-    !!controlsVisible ||
-    !!discussionRequest ||
-    isCueUser ||
-    isInputOpen ||
-    isVoiceOpen ||
-    isRecording ||
-    isProcessing;
+    !compactPlayback &&
+    (!!controlsVisible || !!discussionRequest || isCueUser || isInputOpen || isVoiceOpen || isRecording || isProcessing);
   const toolbar = (
     <CanvasToolbar
       className="shrink-0 h-8 px-3 border-b border-gray-100/40 dark:border-gray-700/30"
@@ -631,6 +628,8 @@ export function Roundtable({
       chatCollapsed={chatCollapsed}
       onToggleSidebar={onToggleSidebar}
       onToggleChat={onToggleChat}
+      onToggleVoice={() => setIsVoiceOpen((open) => !open)}
+      voiceOpen={isVoiceOpen}
       onPrevSlide={onPrevSlide ?? (() => {})}
       onNextSlide={onNextSlide ?? (() => {})}
       onPlayPause={onPlayPause ?? (() => {})}
@@ -651,11 +650,11 @@ export function Roundtable({
     />
   );
 
-  if (isPresenting) {
+  if (isPresenting || compactPlayback) {
     return (
       <div className="h-0 w-full relative z-10 overflow-visible">
         {/* Speech overlay — fills the full stage area via absolute positioning */}
-        <PresentationSpeechOverlay
+        {!compactPlayback && <PresentationSpeechOverlay
           playbackView={enrichedPlaybackView}
           participants={initialParticipants}
           speakingAgentId={speakingAgentId ?? null}
@@ -665,7 +664,7 @@ export function Roundtable({
           audioIndicatorState={audioIndicatorState ?? 'idle'}
           buttonState={enrichedPlaybackView?.buttonState}
           isPaused={isDiscussionPaused || engineMode === 'paused'}
-        />
+        />}
 
         {/* Click-outside backdrop to dismiss input/voice */}
         {(isInputOpen || isVoiceOpen) && (
@@ -866,7 +865,7 @@ export function Roundtable({
           style={{ right: chatCollapsed ? 20 : 20 + (chatAreaWidth ?? 320) }}
         >
           {/* Right-side speech bubble (flows above dock via flex) */}
-          <PresentationSpeechOverlay
+          {!compactPlayback && <PresentationSpeechOverlay
             playbackView={enrichedPlaybackView}
             participants={initialParticipants}
             speakingAgentId={speakingAgentId ?? null}
@@ -877,7 +876,7 @@ export function Roundtable({
             audioIndicatorState={audioIndicatorState ?? 'idle'}
             buttonState={enrichedPlaybackView?.buttonState}
             isPaused={isDiscussionPaused || engineMode === 'paused'}
-          />
+          />}
 
           {/* Dock */}
           <AnimatePresence>
@@ -2092,3 +2091,4 @@ export function Roundtable({
     </div>
   );
 }
+
