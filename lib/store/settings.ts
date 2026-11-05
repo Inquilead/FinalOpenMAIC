@@ -1247,21 +1247,28 @@ export const useSettingsStore = create<SettingsState>()(
                 }
               }
 
-              // LLM auto-select: only on true first load (no provider selected yet)
+              // Auto-select a model when none is active yet. The default provider ID
+              // is initialized to OpenAI, so checking for a missing provider prevented
+              // first-run setup from ever selecting a server-configured model.
               let autoProviderId: ProviderId | undefined;
               let autoModelId: string | undefined;
-              if (!state.providerId && !state.modelId) {
-                for (const [pid, cfg] of Object.entries(newProvidersConfig)) {
-                  if (cfg.isServerConfigured) {
-                    // Prefer server-restricted models, fall back to built-in list
-                    const serverModels = cfg.serverModels;
-                    const modelId = serverModels?.length
-                      ? serverModels[0]
-                      : PROVIDERS[pid as ProviderId]?.models[0]?.id;
-                    if (modelId) {
-                      autoProviderId = pid as ProviderId;
-                      autoModelId = modelId;
-                      break;
+              if (!state.modelId) {
+                const currentProvider = newProvidersConfig[state.providerId];
+                if (currentProvider?.isServerConfigured) {
+                  autoProviderId = state.providerId;
+                  autoModelId =
+                    currentProvider.serverModels?.[0] || currentProvider.models[0]?.id;
+                }
+                if (!autoModelId) {
+                  for (const [pid, cfg] of Object.entries(newProvidersConfig)) {
+                    if (cfg.isServerConfigured) {
+                      // Prefer server-restricted models, then provider model list.
+                      const modelId = cfg.serverModels?.[0] || cfg.models[0]?.id;
+                      if (modelId) {
+                        autoProviderId = pid as ProviderId;
+                        autoModelId = modelId;
+                        break;
+                      }
                     }
                   }
                 }
