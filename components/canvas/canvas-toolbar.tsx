@@ -15,6 +15,8 @@ import {
   Repeat,
   Maximize2,
   Minimize2,
+  Mic,
+  MicOff,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useStageStore } from '@/lib/store';
@@ -31,6 +33,8 @@ export interface CanvasToolbarProps {
   readonly chatCollapsed?: boolean;
   readonly onToggleSidebar?: () => void;
   readonly onToggleChat?: () => void;
+  readonly onToggleVoice?: () => void;
+  readonly voiceOpen?: boolean;
   readonly onPrevSlide: () => void;
   readonly onNextSlide: () => void;
   readonly onPlayPause: () => void;
@@ -90,6 +94,8 @@ export function CanvasToolbar({
   chatCollapsed,
   onToggleSidebar,
   onToggleChat,
+  onToggleVoice,
+  voiceOpen,
   onPrevSlide,
   onNextSlide,
   onPlayPause,
@@ -419,6 +425,11 @@ export function CanvasToolbar({
             )}
           </button>
         )}
+        {onToggleVoice && (
+          <button onClick={onToggleVoice} className={cn(ctrlBtn, 'w-8 h-8 rounded-full border border-violet-300/50', voiceOpen ? 'text-violet-600 bg-violet-500/10' : 'text-gray-600 dark:text-gray-300')} aria-label={voiceOpen ? 'Close microphone' : 'Open microphone'} title={voiceOpen ? 'Close microphone' : 'Speak to your teacher'}>
+            {voiceOpen ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+          </button>
+        )}
         {onToggleChat && (
           <button
             onClick={onToggleChat}
@@ -438,3 +449,4 @@ export function CanvasToolbar({
     </div>
   );
 }
+
