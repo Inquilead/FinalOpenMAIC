@@ -127,7 +127,7 @@ export function SceneSidebar({
             className="flex items-center gap-2 cursor-pointer rounded-lg px-1.5 -mx-1.5 py-1 -my-1 hover:bg-gray-100/80 dark:hover:bg-gray-800/60 active:scale-[0.97] transition-all duration-150"
             title={t('generation.backToHome')}
           >
-            <img src="/logo-horizontal.png" alt="OpenMAIC" className="h-6" />
+            <span className="flex items-center gap-2 text-sm font-bold tracking-tight text-slate-900 dark:text-white"><span aria-hidden="true" className="relative inline-flex size-5 rounded-full border-2 border-violet-500 rotate-[-28deg] after:absolute after:inset-x-[-4px] after:top-[6px] after:h-0.5 after:rounded-full after:bg-cyan-400" />ThinkSphere</span>
           </button>
           <button
             onClick={() => onCollapseChange(true)}
@@ -461,3 +461,4 @@ export function SceneSidebar({
     </div>
   );
 }
+
