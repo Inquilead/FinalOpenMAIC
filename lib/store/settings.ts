@@ -563,7 +563,7 @@ const migrateFromOldStorage = () => {
   let ttsModel = 'openai-tts';
   if (oldTtsModel) ttsModel = oldTtsModel;
 
-  let selectedAgentIds = ['default-1', 'default-2', 'default-3'];
+  let selectedAgentIds = ['default-1'];
   if (oldSelectedAgents) {
     try {
       const parsed = JSON.parse(oldSelectedAgents);
@@ -605,9 +605,9 @@ export const useSettingsStore = create<SettingsState>()(
         modelId: migratedData?.modelId || '',
         providersConfig: migratedData?.providersConfig || getDefaultProvidersConfig(),
         ttsModel: migratedData?.ttsModel || 'openai-tts',
-        selectedAgentIds: migratedData?.selectedAgentIds || ['default-1', 'default-2', 'default-3'],
+        selectedAgentIds: ['default-1'],
         maxTurns: migratedData?.maxTurns?.toString() || '10',
-        agentMode: 'auto' as const,
+        agentMode: 'preset' as const,
         autoAgentCount: 3,
 
         // Playback controls
@@ -1497,3 +1497,4 @@ export const useSettingsStore = create<SettingsState>()(
     },
   ),
 );
+
